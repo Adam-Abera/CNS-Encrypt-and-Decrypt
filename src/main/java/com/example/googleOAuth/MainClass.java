@@ -21,7 +21,9 @@ import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 import java.util.Map;
-
+//AES example plain text: Two One Nine Two
+//AES example key: Thats my Kung Fu
+//3DES example key: 9mng65v8jf4lxn93nabf981m
 public class MainClass {
     JButton encrypt;
     JButton decrypt;
@@ -134,6 +136,8 @@ public class MainClass {
             String d_result = "";
             int bin_d_result = 0;
             String d_result1 = "";
+            String binary_e_key = "";
+            String binary_e_key1 = "";
             byte[] encrypted_pText;
             if (e.getSource() == encrypt)
             {
@@ -145,6 +149,8 @@ public class MainClass {
                                 String a = Integer.toBinaryString(pText.toCharArray()[i]);
                                 String b = Integer.toBinaryString(e_Key.toCharArray()[i]);
                                 e_result1 = "0";
+                                binary_e_key1 = "0";
+                                binary_e_key1 += b;
                                 for (int j = 0; j < a.length(); j++)
                                 {
                                     int c = XOR(Integer.parseInt("" + a.toCharArray()[j]),
@@ -157,15 +163,16 @@ public class MainClass {
                                 }
                                 System.out.println("--------------------------------------");
                                 e_result += e_result1;
-                                e_result += " ";
-                                //bin_e_result = Integer.parseInt(e_result1,2);
-                                //e_result += Character.toString((char) bin_e_result);
-                                //sb.append(Character.toChars(c));
-                                //sb.append(" ");
+                                binary_e_key += binary_e_key1;
+                                if(i<pText.length()-1)
+                                {
+                                    e_result += " ";
+                                    binary_e_key += " ";
+                                }
                             }
-                            //e_result = sb.toString();
                             encryptResult.setText(e_result);
                             System.out.println(e_result);
+                            decryptKey.setText(binary_e_key);
                         } else {
                             JOptionPane.showMessageDialog(mClass.encryptKey, "The plain text and " +
                                     "key's length must be equal! Check if there are spaces at the beginning or" +
@@ -181,7 +188,7 @@ public class MainClass {
                 {
                     byte[] e_Key12 = e_Key.getBytes();
                     SecretKeySpec secretKeySpec = new SecretKeySpec(e_Key12, "TripleDES");
-                    byte[] iv = "aait3des".getBytes();
+                    byte[] iv = "a76nb5h9".getBytes();
                     IvParameterSpec ivSpec = new IvParameterSpec(iv);
                     try
                     {
@@ -233,9 +240,6 @@ public class MainClass {
                         {
                             System.out.println(bit1.length()/8);
                             for (int i = 0; i < (bit1.length()/8); i++) {
-                                //String a = bit.substring((((bit.length()/(n-i))-1)-(8*i)),((8*(n-1))-1));
-                                //n--;
-                                //String b = "0" + Integer.toBinaryString(d_Key.toCharArray()[i]);
                                 d_result1 = "";
                                 for (int j = i*8; j < (i+1)*8; j++)
                                 {
@@ -248,12 +252,8 @@ public class MainClass {
                                     d_result1 += c;
                                 }
                                 System.out.println("--------------------------------------");
-                                //bin_d_result = Integer.parseInt(d_result1,2);
-                                d_result += d_result1 + " ";
-                                //sb.append(Character.toChars(c));
-                                //sb.append(" ");
+                                d_result += binaryToChar(d_result1);
                             }
-                            //e_result = sb.toString();
                             decryptResult.setText(d_result);
                             System.out.println(d_result);
                         } else {
@@ -275,7 +275,7 @@ public class MainClass {
                     try
                     {
                         byte[] d_Key12 = d_Key.getBytes();
-                        byte[] iv = "aait3des".getBytes();
+                        byte[] iv = "a76nb5h9".getBytes();
                         IvParameterSpec ivSpec = new IvParameterSpec(iv);
                         Cipher decryptCipher = Cipher.getInstance("TripleDES/CBC/PKCS5Padding");
                         SecretKeySpec secretKeySpec = new SecretKeySpec(d_Key12, "TripleDES");
@@ -343,5 +343,17 @@ public class MainClass {
         byte[] plainText = cipher.doFinal(Base64.getDecoder()
                 .decode(cipherText));
         return new String(plainText);
+    }
+    static char binaryToChar(String binary)
+    {
+        int result = 0;
+        char a = ' ';
+        for (int j = 0; j < 8; j++)
+        {
+            result += (int) (Integer.parseInt(String.valueOf(binary.toCharArray()[j])) * Math.pow(2, 7 - j));
+        }
+        a = (char) result;
+        System.out.println(a + ": " + result );
+        return a;
     }
 }
